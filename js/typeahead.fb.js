@@ -516,7 +516,7 @@
 
 	// Generate plugin
 	function Plugin() {
-		var args = Array.from(arguments), option = args.shift();
+		var args = [].slice.call(arguments), option = args.shift();
 
 		return this.each(function () {
 			var $this = $(this),
