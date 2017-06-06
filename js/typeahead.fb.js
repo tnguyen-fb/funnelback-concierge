@@ -246,7 +246,7 @@
 			name 	: name,
 			limit 	: 10000, // hack to display all returned data
 			source 	: source,
-			display : displayVal,
+			display : 'value',
 			templates : _renderSetTemplate(set)
 		};
 
