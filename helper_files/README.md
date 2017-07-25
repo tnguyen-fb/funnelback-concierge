@@ -20,6 +20,13 @@ The following helper files can be used to generate autocompletion CSV from the i
 	```
 	-gscope1=3 -SM=off -log=false -num_ranks=1000 -vsimple=true
 	```
+* Configure the triggers in collection.cfg by adding the a ```auto-completion.PROFILENAME.triggers``` field for each profile.  The triggers list is a comma separated list of compound triggers.  A single compound trigger can be made up of more than one field.
+
+	e.g. a person autocompletion might have 4 triggers based on first/last name, last/first name, department and the page title.
+
+	```
+	auto-completion.people.triggers=s.result.metaData["firstName"] s.result.metaData["lastName"],s.result.metaData["lastName"] s.result.metaData["firstName"],s.result.metaData["department"],s.result.title
+	```
 
 ### Step 2: Copy the post process hook script to the collection
 
@@ -44,7 +51,7 @@ The following helper files can be used to generate autocompletion CSV from the i
 
 * Run an update of the collection (note: a reindex of the live view should be sufficient if the collection is already built).
 
-### Step 5
+### Step 5: Configure concierge JavaScript
 
 * Add the new sources to autocompletion.
 * Each new source can be added to concierge by defining a new data source that uses the correct collection and profile.  The results can be templated from the same datasource configuration and all the metadata that was defined in padre\_opts should be available to use in the template,.
