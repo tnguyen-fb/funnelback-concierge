@@ -49,7 +49,7 @@
             <#if response.customData["stopwords"]?? && response.customData["stopwords"]?seq_contains(x)>
                 <#assign trigger>${trigger?replace("^"+x+"\\s+","","r")}</#assign>
             <#elseif trigger??>
-                "${trigger}",900,${escapeText(displayJson)},J,"",,"${s.result.clickTrackingUrl!}",U
+                "${trigger}",900,${escapeCsv(displayJson)},J,"",,"${s.result.clickTrackingUrl!}",U
                 <#assign trigger>${trigger?replace("^"+x+"\\s+","","r")}</#assign>
             </#if>
         </#list>
@@ -58,6 +58,6 @@
 </@s.Results>
 </#compress>
 
-<#function escapeText str>
-    <#return str!?chop_linebreak?trim?replace("\"", "\\\",")?replace(",", "\\,") />
+<#function escapeCsv str>
+    <#return str!?chop_linebreak?trim?replace("\"", "\\\"")?replace(",","\\,") />
 </#function>
