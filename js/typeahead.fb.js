@@ -1,9 +1,9 @@
 /*
  * Funnelback concierge auto-completion plugin
- * version 2.2
+ * version 2.3
  *
  * author: Liliana Nowak
- * Copyright Funnelback, 2015-2016
+ * Copyright Funnelback, 2015-2017
  *
  * @requires jQuery https://jquery.com/
  * @requires typeahead.js https://twitter.github.io/typeahead.js/
@@ -22,7 +22,7 @@
 	// Default options
 	qc.defaults = {
 		// set configuration
-		datasets : null,				// {set1: {url: ''}, set2: {...}, set3: {...}}       
+		datasets : null,				// {set1: {url: ''}, set2: {...}, set3: {...}}
 		/*
 		defaultCall   : {				// 'string'|[]|{}; use to trigger auto-completion when input value is empty and length=0
 			filter    : _processDataTopQueries,	// function(set, data); filter function used to map response data
@@ -47,6 +47,7 @@
 
 		// URL settings
 		collection 		: null,			// 'string'; the collection name
+		dataType 		: 'json',   // 'json'|'jsonp'; the type of data returned back from the server
 		alpha 			: '0.5',		// 'string'; adjust the balance between length and relevancy for spelling based suggestions
 		format 			: 'extended',	// 'simple|extended'; mapping into 'json' or 'json++'
 		params 			: null,			// {}; custom URL parameters
@@ -115,7 +116,7 @@
 			if (key === 'debug') _debug = val;
 			if (key === 'horizontal' && val) {
 				that.setTypeaheadClass('menu', 'tt-horizontal');
-				
+
 				that.options.typeahead.events.render = function(event) {
 					_renderSetWidth(that.getTypeaheadMenu(), 'tt-horizontal', 'tt-dataset');
 				};
@@ -202,7 +203,7 @@
 
 	// Private variables
 	var _debug = false,
-	_mapKeys = ['collection', 'callback', 'alpha', 'filter', 'format', 'group', 'groupOrder', 'itemGroup', 'itemLabel', 'params', 'profile', 'program', 'show', 'sort', 'queryKey', 'queryVal', 'template', 'templateMerge'],
+	_mapKeys = ['collection', 'callback', 'dataType', 'alpha', 'filter', 'format', 'group', 'groupOrder', 'itemGroup', 'itemLabel', 'params', 'profile', 'program', 'show', 'sort', 'queryKey', 'queryVal', 'template', 'templateMerge'],
 	_navCols = {cursor : null, query  : ''};
 
 	// Private methods
@@ -231,14 +232,7 @@
 		var engine = new Bloodhound({
 			datumTokenizer : Bloodhound.tokenizers.obj.whitespace('value'),
 			queryTokenizer : Bloodhound.tokenizers.whitespace,
-			remote         : {
-				url      : set.url ? set.url : _getSetUrl(set),
-				wildcard : set.queryVal,
-				filter   : function (response) {
-					var query = getQuery($(this).get(0).transport.lastReq);
-					return _handleSetData(set, $.map(response, function(suggestion, i) { return set.filter(set, suggestion, i, name, query) }));
-				}
-			}
+			remote         : getBloodhoundRemote()
 		});
 		engine.initialize();
 
@@ -246,9 +240,33 @@
 			name 	: name,
 			limit 	: 10000, // hack to display all returned data
 			source 	: source,
-			display : 'value',
+			display : displayVal,
 			templates : _renderSetTemplate(set)
-		};
+		}
+
+		function displayVal(suggestion) {
+			return $.isFunction(set.itemLabel) ? set.itemLabel.call(undefined, suggestion) : $.dataVals(suggestion, set.itemLabel);
+		}
+
+		function getBloodhoundRemote() {
+			var remote = {
+				url    : set.url ? set.url : _getSetUrl(set),
+				filter : function (response) {
+					var query = getQuery($(this).get(0).transport.lastReq);
+					return _handleSetData(set, $.map(response, function(suggestion, i) { return set.filter(set, suggestion, i, name, query) }));
+				}
+			};
+			if (set.dataType === 'jsonp') {
+				remote['prepare'] = function(query, settings) {
+					settings.dataType = 'jsonp';
+					settings.url = settings.url.replace(set.queryVal, query);
+					return settings;
+				};
+			} else {
+				remote['wildcard'] = set.queryVal;
+			}
+			return remote;
+		}
 
 		function getQuery(str) {
 			if (!$.exist(str, true)) return str;
@@ -462,7 +480,7 @@
 		if(!$.exist(currColItems)) return;
 
 		var cursorIdx = currColItems.index(_navCols.cursor), delta = code == 38 ? -1 : 1;
-		
+
 		$(_navCols.cursor).removeClass('tt-cursor');
 
 		if (!$.exist(currColItems[cursorIdx + delta])) {
@@ -525,10 +543,10 @@
 
 			if (!data && /destroy|hide/.test(option)) return;
 			if (!data) $this.data('fb.qc', (data = new qc(this, options)));
-			if ($.isString(option) && $.isFunction(data[option])) data[option].apply($this, args);	
+			if ($.isString(option) && $.isFunction(data[option])) data[option].apply($this, args);
 		});
 	}
-	
+
 	$.fn.qc             = Plugin;
 	$.fn.qc.Constructor = qc;
 
