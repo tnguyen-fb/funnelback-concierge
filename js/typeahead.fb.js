@@ -42,7 +42,10 @@
 		groupOrder 		: [],			// []; list of group headers used to sort grouped suggestions in that order
 		itemGroup 		: 'category',	// 'string'; the name of field used to group suggestions and display as group header in dropdown
 		itemLabel 		: 'value',		// 'string'; the name of a field to be displayed in input field
-		template 		: {},			// {notFound: '', pending: '', header: '', footer: '', suggestion: ''}
+		template 		: {				// {notFound: '', pending: '', header: '', footer: '', group: '', suggestion: ''}
+			group: function(context) { console.log('GROUP', context); return $('<div>').html(context.label); },
+			suggestion: function(context) { console.log('SUGG', context); return $('<div>').html(context.label); }
+		},
 		templateMerge 	: true,			// true|false; to wrap notFound and pending template with header and footer template
 
 		// URL settings
@@ -377,7 +380,6 @@
 
 	function _renderSetTemplate(set) {
 		_setSetTemplateHeader(set);
-		_setSetTemplateSuggestion(set);
 
 		if (!set.template || $.isEmptyObject(set.template)) return {};
 
@@ -406,10 +408,6 @@
 
 	function _setSetTemplateHeader(set) {
 		if (!set.template.header && $.exist(set.name, true)) set.template.header = '<h5 class="tt-category">' + set.name + '</h5>';
-	}
-
-	function _setSetTemplateSuggestion(set) {
-		if (!set.template.suggestion) set.template.suggestion = function(context) { return $('<div>').html(context.label); }
 	}
 
 	// Handle set item
