@@ -43,8 +43,8 @@
 		itemGroup 		: 'category',	// 'string'; the name of field used to group suggestions and display as group header in dropdown
 		itemLabel 		: 'value',		// 'string'; the name of a field to be displayed in input field
 		template 		: {				// {notFound: '', pending: '', header: '', footer: '', group: '', suggestion: ''}
-			group: function(context) { return $('<div>').html(context.label); },
-			suggestion: function(context) { return $('<div>').html(context.label); }
+			group: function(context) { return $('<div>').html(String(context.label)); },
+			suggestion: function(context) { return $('<div>').html(String(context.label)); }
 		},
 		templateMerge 	: true,			// true|false; to wrap notFound and pending template with header and footer template
 
