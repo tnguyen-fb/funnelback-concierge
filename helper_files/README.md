@@ -20,12 +20,12 @@ The following helper files can be used to generate autocompletion CSV from the i
 	```
 	-gscope1=3 -SM=off -log=false -num_ranks=1000 -vsimple=true
 	```
-* Configure the triggers in collection.cfg by adding the a ```auto-completion.PROFILENAME.triggers``` field for each profile.  The triggers list is a comma separated list of compound triggers.  A single compound trigger can be made up of more than one field.
+* Configure the triggers in collection.cfg by adding the a ```auto-completion.PROFILENAME.triggers``` field for each profile.  The triggers list is a comma separated list of compound triggers.  A single compound trigger can be made up of more than one field.  Note: ensure you handle error cases by setting a default value for any Freemarker variable that may be null.
 
 	e.g. a person autocompletion might have 4 triggers based on first/last name, last/first name, department and the page title.
 
 	```
-	auto-completion.people.triggers=s.result.metaData["firstName"] s.result.metaData["lastName"],s.result.metaData["lastName"] s.result.metaData["firstName"],s.result.metaData["department"],s.result.title
+	auto-completion.people.triggers=s.result.metaData["firstName"]! s.result.metaData["lastName"]!,s.result.metaData["lastName"]! s.result.metaData["firstName"]!,s.result.metaData["department"]!,s.result.title
 	```
 
 ### Step 2: Copy the post process hook script to the collection
