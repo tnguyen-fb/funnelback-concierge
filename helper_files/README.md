@@ -7,6 +7,10 @@ The following helper files can be used to generate autocompletion CSV from the i
 * **hook\_post\_process.groovy:** Groovy script (required by Freemarker template) to inject stop words into the data model.
 * **post\_index.sh:** Post index workflow script to generate auto-completion when the collection updates.
 
+# Limitations:
+
+* The Freemarker template currently only supports URL actions, sourced from the document's URL. This will be exteneded to support query triggers at some point.
+
 # Usage instructions
 
 ### Step 1: Create profiles for each auto-completion source
